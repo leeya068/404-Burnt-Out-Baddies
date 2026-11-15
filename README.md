@@ -1,5 +1,5 @@
 
-# 404-Burnt-Out-Baddies — UMDAC Datathon 2026 (Preliminary Round)
+# 404 Burnt Out Baddies — UMDAC Datathon 2026 (Preliminary Round)
 
 Reverse-engineering the business rules behind Swift's artificial cross-border payment dataset.
 
