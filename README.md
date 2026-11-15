@@ -256,8 +256,8 @@ python -m ipykernel install --user --name=datathon --display-name "Python (Datat
 ## Project Status
 
 - [x] Environment and DuckDB pipeline set up
-- [x] Aggregates built (`agg/`)
-- [x] Dashboard PDF completed (12 pages, saved to output/)
+- [x] Aggregates built (`data_agg/`)
+- [x] Dashboard PDF completed (13 pages, saved to output/)
 - [ ] Slide deck completed (10–20 slides)
 - [ ] Hypothesis log and rejected-hypothesis slide drafted
 - [ ] Self-check against judging rubric
