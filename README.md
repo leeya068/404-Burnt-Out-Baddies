@@ -9,15 +9,40 @@ Reverse-engineering the business rules behind Swift's artificial cross-border pa
 
 ---
 
-## Team
+## Team & Responsibilities
 
-| Member | GitHub | Owns (feature groups) |
-|---|---|---|
-| *Aleeya Nazirah binti Jamil* | [@leeya068](https://github.com/leeya068) | Currency & amounts; anomalies |
-| *Raja Athira Sofea binti Raja Azlan* | @handle | Routing / BIC path / duration / transaction type |
-| *Alliyana binti Abdul Rahman* | @handle | Party details & tokens; party type; temporal patterns |
+| Member | GitHub | Primary Role | Key Deliverables |
+|---|---|---|---|
+| *Aleeya Nazirah binti Jamil* | [@leeya068](https://github.com/leeya068) | **Data Cleaning & Dashboard Engineering** | Data pipeline (DuckDB aggregates), data preparation log, chart generation, dashboard layout, PDF assembly |
+| *Raja Athira Sofea binti Raja Azlan* | @handle | **Presentation & Insight Synthesis** | Slide deck narrative structure, rule statements, economic interpretation, slide visual design, APA citations |
+| *Alliyana binti Abdul Rahman* | @handle | **Presentation & Quality Assurance** | Cross-referencing dashboard evidence to slides, rubric self-check, compliance documentation, hypothesis log, final proofreading |
 
-> **Team rule:** No member replacement after registration. Each member owns their feature groups end-to-end (analysis → dashboard → slides).
+> **Team rule:** No member replacement after registration. Each member owns their deliverables end-to-end, but all three review the final PDFs together before submission.
+
+---
+
+### Workstream Breakdown
+
+**Aleeya — Data & Dashboard**
+- Build and maintain the DuckDB streaming pipeline (1.5 GB CSV → aggregated CSVs).
+- Document all data cleaning decisions (null handling, placeholder parsing, dropped columns).
+- Generate all charts using the agreed colour palette and layout template.
+- Export the final dashboard PDF (12 pages) and ensure every chart shows a baseline comparison.
+- Ensure all outputs are saved to the `output/` folder.
+
+**Athira — Presentation & Narrative**
+- Write the slide deck narrative: headline finding first, methodology, one slide per feature group, conclusion.
+- Restate each reconstructed rule in the required format: *When [condition], [effect] by [magnitude], covering [scope].*
+- Draft the economic interpretation for each rule (why it exists in the real world).
+- Source and format all APA citations with embedded URLs.
+- Design slide visuals to match the dashboard colour scheme.
+
+**Alliyana — QA, Compliance & Final Check**
+- Cross-check every slide claim against the corresponding dashboard chart (claim-evidence linkage).
+- Maintain the hypothesis log: what was tested, what was rejected, what remains uncertain.
+- Verify compliance: dataset-only usage, no external primary data, tool disclosures, AI usage explainability.
+- Run the rubric self-check before submission (Insight Quality 45%, Evidence 23%, Communication 20%, Interpretation 12%).
+- Proofread both PDFs for typos, formatting consistency, and page numbering.
 
 ---
 
@@ -115,14 +140,17 @@ Run the SQL scripts in `queries/` against the full path to the raw CSV. Generate
 
 ### Aggregate Files
 
-| File | Covers | Feature Group |
-|---|---|---|
-| `agg/agg_currency_partytype.csv` | Amount by currency × party type | Currency & amounts |
-| `agg/agg_routing.csv` | Transaction type × continuity → participants / duration / FX | Routing |
-| `agg/agg_anomaly.csv` | Anomaly type × party-type signature | Anomalies |
-| `agg/agg_hour_currency.csv` | Hour of day × currency | Temporal |
-| `agg/agg_amount_bins.csv` | `log10` amount bins by party type | Amount distribution |
-| `agg/agg_conversion.csv` | FX steps × transaction type | Routing / FX |
+| **File**                              | **Covers**                                                   | **Feature Group**    |
+|:--------------------------------------|:-------------------------------------------------------------|:--------------------|
+| `data_agg/agg_currency_partytype.csv`  | Amount by currency × party type                              | Currency & amounts  |
+| `data_agg/agg_routing.csv`             | Transaction type × continuity → participants / duration / FX | Routing             |
+| `data_agg/agg_anomaly.csv`             | Anomaly type × party-type signature                          | Anomalies           |
+| `data_agg/agg_hour_currency.csv`       | Hour of day × currency                                       | Temporal            |
+| `data_agg/agg_amount_bins.csv`         | `log10` amount bins by party type                             | Amount distribution |
+| `data_agg/agg_conversion.csv`          | FX steps × transaction type                                  | Routing / FX        |
+| `data_agg/agg_fat_finger.csv`          | Amount distribution for fat-finger anomalies                 | Anomalies           |
+| `data_agg/agg_duration_hops.csv`       | Duration by participant count                                | Routing             |
+| `data_agg/agg_hour_routing.csv`        | Hour of day × routing type                                   | Temporal / Routing  |
 
 ### Regenerate an Aggregate (Example)
 
@@ -138,13 +166,13 @@ COPY (
         AVG(USD_AMOUNT) AS avg_amount,
         MEDIAN(USD_AMOUNT) AS median_amount
     FROM read_csv(
-        'C:/Users/leeya/404-Burnt-Out-Baddies/swift_umdac_datathon_2026_fictitious_payment_data.csv'
+        'C:/Users/leeya/404-Burnt-Out-Baddies/data_raw/swift_umdac_datathon_2026_fictitious_payment_data.csv'
     )
     GROUP BY
         CURRENCY_CODE,
         ORDERING_TYPE,
         BENEFICIARY_TYPE
-) TO 'agg/agg_currency_partytype.csv'
+) TO 'data_agg/agg_currency_partytype.csv'
   (HEADER, DELIMITER ',');
 ```
 
@@ -158,13 +186,14 @@ Update the input path to wherever the raw dataset is stored on your machine.
 .
 ├── README.md
 ├── .gitignore
-├── queries/             # SQL used to build agg/*.csv
-├── agg/                 # Small aggregated CSVs (committed)
-├── notebooks/           # Per-person analysis; not run on the full dataset
-│   ├── currency_amounts.ipynb
-│   ├── routing.ipynb
-│   └── party_temporal.ipynb
-├── dashboard/           # Chart sources and exported dashboard PDF
+├── queries/             # SQL used to build data_agg/*.csv
+├── data_raw/            # Full 1.5 GB CSV (local only, ignored by git)
+├── data_agg/            # Small aggregated CSVs (committed)
+├── notebooks/           # Analysis and chart generation notebooks
+│   └── dashboard_generator.ipynb
+├── output/              # Final PDFs and rendered pages
+│   ├── dashboard_final.pdf
+│   └── page*.png        # Intermediate renders (ignored by git)
 └── slides/              # Slide deck source and exported PDF
 ```
 
@@ -207,6 +236,8 @@ python -m ipykernel install --user --name=datathon --display-name "Python (Datat
 - Maintain one notebook per feature group to avoid merge conflicts.
 - Every dashboard chart must show the finding against a baseline or comparison group, and include a takeaway title and clear labels.
 - Every headline claim must be traceable to a chart or calculation.
+- All outputs (PDFs, PNGs) must be saved to the `output/` folder, not the repository root.
+- Intermediate files (`page*.png`) are ignored by git and should not be committed.
 
 ---
 
@@ -225,8 +256,8 @@ python -m ipykernel install --user --name=datathon --display-name "Python (Datat
 
 - [x] Environment and DuckDB pipeline set up
 - [x] Aggregates built (`agg/`)
-- [ ] Rules reconstructed for each feature group
-- [ ] Dashboards completed (5–15)
+- [x] Dashboard PDF completed (12 pages, saved to output/)
 - [ ] Slide deck completed (10–20 slides)
+- [ ] Hypothesis log and rejected-hypothesis slide drafted
 - [ ] Self-check against judging rubric
-- [ ] Submission completed before **19 Nov 2026, 12:00 PM**
+- [ ] Submission completed before 19 Nov 2026, 12:00 PM
