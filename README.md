@@ -27,7 +27,7 @@ Reverse-engineering the business rules behind Swift's artificial cross-border pa
 - Build and maintain the DuckDB streaming pipeline (1.5 GB CSV → aggregated CSVs).
 - Document all data cleaning decisions (null handling, placeholder parsing, dropped columns).
 - Generate all charts using the agreed colour palette and layout template.
-- Export the final dashboard PDF (12 pages) and ensure every chart shows a baseline comparison.
+- Export the final dashboard PDF (13 pages) and ensure every chart shows a baseline comparison.
 - Ensure all outputs are saved to the `output/` folder.
 
 **Athira — Presentation & Narrative**
@@ -186,6 +186,7 @@ Update the input path to wherever the raw dataset is stored on your machine.
 .
 ├── README.md
 ├── .gitignore
+├── comp materials/      # Competition materials
 ├── queries/             # SQL used to build data_agg/*.csv
 ├── data_raw/            # Full 1.5 GB CSV (local only, ignored by git)
 ├── data_agg/            # Small aggregated CSVs (committed)
